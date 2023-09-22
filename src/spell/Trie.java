@@ -38,11 +38,13 @@ public class Trie implements ITrie {
 
     @Override
     public void add(String word) {
-        INode localNode = rootNode;
+        INode localNode = this.rootNode;
+
+        word = word.toLowerCase();
 
         for(int i = 0; i < word.length(); i++){
-            char currChar = word.charAt(i);
-            int charIndex = currChar - 'a';
+            char curChar = word.charAt(i);
+            int charIndex = curChar - 'a';
             INode[] children = localNode.getChildren();
             if (children[charIndex] == null) {
                 children[charIndex] = new Node();
@@ -52,12 +54,25 @@ public class Trie implements ITrie {
         }
 
         localNode.incrementValue();
-        wordCount++;
+        if (localNode.getValue() == 1) wordCount++;
     }
 
     @Override
     public INode find(String word) {
-        return null;
+        INode curNode = this.rootNode;
+
+        word = word.toLowerCase();
+
+        for (int i = 0; i < word.length(); i++) {
+            char curChar = word.charAt(i);
+            int charIndex = curChar - 'a';
+
+            INode[] children = curNode.getChildren();
+            if (children[charIndex] == null) return null;
+            curNode = children[charIndex];
+        }
+        if(curNode.getValue() == 0) return null;
+        return curNode;
     }
 
     @Override
@@ -72,13 +87,35 @@ public class Trie implements ITrie {
     @Override
     public boolean equals(Object o) {
         //if null return false
+        if(o == null) return false;
         //if not a trie return false
+        if(!(o instanceof Trie)) return false;
+        if(o == this) return true;
         //if wordcount not equal return false
         //if nodecount not equal return false
-        return false;//equalsHelper(this.root, other.root);
+        Trie t = (Trie) o;
+        if(this.wordCount !=  t.wordCount && this.nodeCount != t.nodeCount) return false;
+        //equalsHelper(this.root, other.root)
+        return equalsHelper(this.rootNode, ((Trie) o).rootNode);
+
     }
 
-    private boolean equalsHelper(INode a, INode b){
-        return false;//Compare a and b
+    private boolean equalsHelper(INode a, INode b) {
+        if (a.getValue() != b.getValue()) return false;
+        INode[] aChildren = a.getChildren();
+        INode[] bChildren = b.getChildren();
+        if (aChildren.length != bChildren.length) return false;
+        for (int i = 0; i < aChildren.length; i++) {
+            INode aNode = aChildren[i];
+            INode bNode = bChildren[i];
+//            if (myNode == null && otherNode == null) {
+//                // that is ok
+//            } else {
+//                if (myNode.getValue() != otherNode.getValue()) return false;
+//                if (myNode.getChildren() != otherNode.getChildren()) return false;
+//            }
+            equalsHelper(myNode, otherNode);
+        }
+        return true;//Compare a and b
     }
 }
