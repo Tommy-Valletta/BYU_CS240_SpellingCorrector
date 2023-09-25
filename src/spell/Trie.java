@@ -94,28 +94,42 @@ public class Trie implements ITrie {
         //if wordcount not equal return false
         //if nodecount not equal return false
         Trie t = (Trie) o;
-        if(this.wordCount !=  t.wordCount && this.nodeCount != t.nodeCount) return false;
+        if(this.wordCount != t.wordCount || this.nodeCount != t.nodeCount) return false;
         //equalsHelper(this.root, other.root)
         return equalsHelper(this.rootNode, ((Trie) o).rootNode);
 
     }
 
     private boolean equalsHelper(INode a, INode b) {
+        if (a == null) {
+            if (b != null) return false;
+            return true;
+        }
         if (a.getValue() != b.getValue()) return false;
         INode[] aChildren = a.getChildren();
         INode[] bChildren = b.getChildren();
         if (aChildren.length != bChildren.length) return false;
+
+        boolean allGood = true;
         for (int i = 0; i < aChildren.length; i++) {
             INode aNode = aChildren[i];
             INode bNode = bChildren[i];
-//            if (myNode == null && otherNode == null) {
-//                // that is ok
-//            } else {
-//                if (myNode.getValue() != otherNode.getValue()) return false;
-//                if (myNode.getChildren() != otherNode.getChildren()) return false;
-//            }
-            equalsHelper(myNode, otherNode);
+            if (!equalsHelper(aNode, bNode)) {
+                allGood = false;
+                break;
+            }
         }
-        return true;//Compare a and b
+        return allGood;
+    }
+
+    @Override
+    public int hashCode() {
+        int index = 27;
+        INode[] children = this.rootNode.getChildren();
+        int length = children.length;
+        for (int i = 0; i < length; i++){
+            if (children[i] != null) index = i;
+        }
+        return this.nodeCount * this.wordCount * index;
     }
 }
